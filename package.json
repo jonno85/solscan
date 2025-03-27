@@ -1,0 +1,23 @@
+{
+  "name": "solana-explorer",
+  "version": "1.0.0",
+  "description": "A blockchain explorer for the Solana network",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "start-backend": "cd backend && npm start",
+    "start-frontend": "cd frontend && npm start",
+    "dev": "concurrently \"npm run start-backend\" \"npm run start-frontend\""
+  },
+  "keywords": [
+    "solana",
+    "blockchain",
+    "explorer"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "packageManager": "yarn@4.7.0"
+}
