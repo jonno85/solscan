@@ -10,6 +10,7 @@ import blockRoutes from './routes/blocks.js';
 import transactionRoutes from './routes/transactions.js';
 import accountRoutes from './routes/accounts.js';
 import tokenRoutes from './routes/tokens.js';
+import validatorRoutes from './routes/validators.js';
 import logger from './utils/logger.js';
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/v1/blocks', blockRoutes);
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/accounts', accountRoutes);
 app.use('/api/v1/tokens', tokenRoutes);
+app.use('/api/v1/validators', validatorRoutes);
 
 io.on('connection', (socket) => {
   logger.info('Client connected');

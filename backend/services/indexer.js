@@ -2,10 +2,10 @@ import config from 'config';
 import Block from '../models/block.js';
 import Transaction from '../models/transaction.js';
 import Account from '../models/account.js';
+import Validator from '../models/validator.js';
 import { connection } from './solana.js';
 import logger from '../utils/logger.js';
 import decodeLookupTableData from './lookupTable.js';
-import account from '../models/account.js';
 
 async function indexLatestBlocks(count = 10) {
   try {
@@ -192,24 +192,34 @@ async function getPaginatedAccountsInfo(addresses, limit = 100) {
   return accounts;
 }
 
-async function getAccountInfoWithRetry(publicKey, retries = 3, delay = 1000) {
+async function indexValidators() {
   try {
-    return await connection.getAccountInfo(publicKey);
+    const validators = await connection.getVoteAccounts();
+    const validatorPromises = validators.current.map(async (validator) => {
+      const existingValidator = await Validator.findOne({ identity: validator.nodePubkey.toString() });
+      if (!existingValidator) {
+        const newValidator = new Validator({
+          identity: validator.nodePubkey.toString(),
+          voteAccount: validator.votePubkey.toString(),
+          commission: validator.commission,
+          activatedStake: validator.activatedStake,
+          lastVote: validator.lastVote,
+        });
+        await newValidator.save();
+      }
+    });
+
+    await Promise.all(validatorPromises);
   } catch (error) {
-    if (retries > 0) {
-      logger.warn(`Retrying getAccountInfo for ${publicKey.toString()} (retries left: ${retries})`);
-      await new Promise((resolve) => setTimeout(resolve, delay));
-      return getAccountInfoWithRetry(publicKey, retries - 1, delay * 2); // Exponential backoff
-    } else {
-      logger.error(`Failed to get account info for ${publicKey.toString()} after multiple retries:`, error);
-      throw error;
-    }
+    logger.error('Error indexing validators:', error);
   }
 }
 
 function startIndexing(io) {
   // Initial indexing when server starts
   indexLatestBlocks(10);
+
+  indexValidators();
 
   // Set up recurring indexing job
   const indexRate = config.get('indexRate');

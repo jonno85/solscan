@@ -19,7 +19,7 @@ router.get('/:address', async (req, res) => {
     } catch (error) {
       return res.status(400).json({ error: 'Invalid Solana address' });
     }
-    
+    const pubKeyAccount = new PublicKey(address);
     const cachedData = await cacheService.get(`account_${address}`);
     if (cachedData) {
       return res.json(cachedData);
@@ -29,23 +29,24 @@ router.get('/:address', async (req, res) => {
       
     if (!account) {
       // Try to fetch from Solana if not in our DB
-      const accountInfo = await connection.getAccountInfo(new PublicKey(address));
-      if (!accountInfo) {
+      const accountInfo = await connection.getAccountInfo(pubKeyAccount);
+      if (!accountInfo && !accountInfo.owner) {
         return res.status(404).json({ error: 'Account not found' });
       }
       
-      const balance = await connection.getBalance(new PublicKey(address));
+      const balance = await connection.getBalance(pubKeyAccount);
       
-      account = {
+      account = new Account({
         address,
         lamports: balance,
         owner: accountInfo.owner.toString(),
         executable: accountInfo.executable,
         rentEpoch: accountInfo.rentEpoch,
         data: accountInfo.data.toString()
-      };
+      });
+      account.save();
     }
-    
+
     // Get recent transactions for this account
     const recentTransactions = await Transaction.find({ accounts: address })
       .sort({ blockTime: -1 })
