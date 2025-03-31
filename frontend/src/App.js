@@ -8,6 +8,7 @@ import Block from './pages/Block';
 import Transaction from './pages/Transaction';
 import Account from './pages/Account';
 import Token from './pages/Token';
+import Validators from './pages/Validators';
 
 const socket = io('http://localhost:5001', { transports: ['websocket'] });
 
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/tx/:signature" element={<Transaction />} />
                 <Route path="/address/:address" element={<Account />} />
                 <Route path="/token/:mint" element={<Token />} />
+                <Route path="/validators" element={<Validators />} />
               </Routes>
             </div>
           </div>

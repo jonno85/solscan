@@ -26,3 +26,9 @@ export const formatRentEpoch = (nanoseconds) => {
   const date = new Date(milliseconds);
   return date.toLocaleString();
 };
+
+export const formatBalance = (balance) => {
+  if (balance === undefined || balance === null) return 'Unknown';
+  const solBalance = balance / 1000000000;
+  return `${solBalance.toLocaleString()} SOL`;
+};

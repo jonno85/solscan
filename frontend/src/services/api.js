@@ -16,7 +16,6 @@ const apiClient = axios.create({
 export const fetchBlocks = async (page = 1, limit = 10) => {
   try {
     const response = await apiClient.get(`/blocks?page=${page}&limit=${limit}`);
-    console.log('Blocks:', response);
     return response.data;
   } catch (error) {
     console.error('Error fetching blocks:', error);
@@ -165,6 +164,27 @@ export const fetchNetworkStats = async () => {
     return response.data;
   } catch (error) {
     console.error('Error fetching network stats:', error);
+    throw error;
+  }
+};
+
+// Validators API
+export const fetchValidators = async (page = 1, limit = 10) => {
+  try {
+    const response = await apiClient.get(`/validators?page=${page}&limit=${limit}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching validators:', error);
+    throw error;
+  }
+};
+
+export const fetchValidatorByIdentity = async (identity) => {
+  try {
+    const response = await apiClient.get(`/validators/${identity}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching validator with identity ${identity}:`, error);
     throw error;
   }
 };

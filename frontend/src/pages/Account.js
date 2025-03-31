@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ClipboardIcon, CheckIcon } from '@heroicons/react/outline';
+import { useParams } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { fetchAccountByAddress, fetchTransactionsByAccount } from '../services/api';
-import { shortenAddress } from '../utils/helpers';
+import { fetchAccountByAddress } from '../services/api';
 import AccountOverview from '../components/AccountOverview';
 import AccountTokenHoldings from '../components/AccountTokenHoldings';
 import AccountTransactionHistory from '../components/AccountTransactionHistory';
@@ -18,7 +16,6 @@ const Account = () => {
   const [copied, setCopied] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const perPage = 10;
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -41,31 +38,6 @@ const Account = () => {
       fetchAccount();
     }
   }, [address]);
-
-
-  useEffect(() => {
-
-  
-    const fetchTransactions = async () => {
-      try {
-        setTransactionsLoading(true);
-        const response = await fetchTransactionsByAccount(address, page, perPage);
-        console.log('Transactions>>>>:', response);
-        setTransactions(prevTxs => page === 1 ? response.transactions : [...prevTxs, ...response.transactions]);
-        setHasMore(response.data.transactions.length === perPage);
-        setError(null);
-      } catch (err) {
-        setError('Failed to load transactions');
-        console.error('Error fetching transactions:', err);
-      } finally {
-        setTransactionsLoading(false);
-      }
-    };
-    if (page > 1) {
-      fetchTransactions();
-    }
-
-  }, [address, page]);
 
   const loadMoreTransactions = () => {
     setPage(prevPage => prevPage + 1);
