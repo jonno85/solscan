@@ -1,0 +1,11 @@
+{
+  "mongoURI": "mongodb://admin:password@localhost:27017/solana_explorer?authSource=admin",
+  "redis": {
+    "host": "127.0.0.1",
+    "port": 6379
+  },
+  "port": 5001,
+  "indexRate": 60000,
+  "cacheExpiry": 300,
+  "solanaRPC": "https://api.devnet.solana.com"
+}

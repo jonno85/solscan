@@ -1,6 +1,7 @@
 # Solana Explorer
 
 A blockchain explorer for the Solana network, similar to Solscan.io.
+Dummy docker configuration including secret just for demonstration purposes.
 
 ## Features
 

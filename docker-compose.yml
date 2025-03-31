@@ -1,0 +1,74 @@
+
+services:
+  solscan-mongodb:
+    image: mongo:latest
+    container_name: solana-explorer-mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - solscan_mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=solana_explorer
+    networks:
+      - solscan-solana-explorer-network
+    restart: unless-stopped
+  solscan-redis:
+    image: redis:latest
+    container_name: solana-explorer-redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    networks:
+      - solscan-solana-explorer-network
+    restart: unless-stopped
+
+  solscan-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: solana-explorer-backend
+    ports:
+      - 5001:5001
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://admin:password@mongodb:27017/solana_explorer?authSource=admin
+      - PORT=5001
+    depends_on:
+      - solscan-mongodb
+    networks:
+      - solscan-solana-explorer-network
+    restart: unless-stopped
+
+  solscan-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: solana-explorer-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:5001/api
+    depends_on:
+      - solscan-backend
+    networks:
+      - solscan-solana-explorer-network
+    restart: unless-stopped
+
+networks:
+  solscan-solana-explorer-network:
+    driver: bridge
+
+volumes:
+  solscan_mongodb_data:
+    driver: local
+  redis_data:
